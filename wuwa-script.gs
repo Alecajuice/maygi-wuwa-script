@@ -307,7 +307,7 @@ function runCalculations() {
   for (var i = ROTATION_START; i <= ROTATION_END; i++) {
     swapped = false;
     let healFound = false;
-    let removeBuff = null;
+    let removeBuff = [];
     let removeBuffInstant = [];
     let passiveDamageQueue = [];
     let passiveDamageQueued = null;
@@ -641,9 +641,9 @@ function runCalculations() {
         if (buff.type === 'ConsumeBuffInstant') { //these buffs are immediately withdrawn before they are calculating
           removeBuffInstant.push(buff.classifications);
         } else if (buff.type === 'ConsumeBuff') {
-          if (removeBuff != null)
+          if (removeBuff.includes(buff.classifications))
             console.log("UNEXPECTED double removebuff condition.");
-          removeBuff = buff.classifications; //remove this later, after other effects apply
+          removeBuff.push(buff.classifications); //remove this later, after other effects apply
         } else if (buff.type === 'ResetBuff') {
           let buffArray = Array.from(activeBuffs[activeCharacter]);
           let buffArrayTeam = Array.from(activeBuffs['Team']);
@@ -722,7 +722,7 @@ function runCalculations() {
             }
           }
         }
-        if (buff.dCond != null) {
+        if (buff.dCond != null && buff.type != 'Dmg') {
           buff.dCond.forEach((value, condition) => {
             evaluateDCond(value * stacksToAdd, condition);
           });
@@ -1038,7 +1038,9 @@ function runCalculations() {
     console.log("DAMAGE CALC for : " + skillRef.name);
     console.log(skillRef);
     console.log("multiplier: " + totalBuffMap.get('Multiplier'));
-    passiveDamageInstances = passiveDamageInstances.filter(passiveDamage => !passiveDamage.canRemove(currentTime, removeBuff));
+    removeBuff.forEach(buff => {
+      passiveDamageInstances = passiveDamageInstances.filter(passiveDamage => !passiveDamage.canRemove(currentTime, buff));
+    })
 
     function evaluateDCond(value, condition) {
       if (value && value != 0) {
@@ -1164,20 +1166,20 @@ function runCalculations() {
     }
     liveTime += skillRef.castTime; //live time
     
-    if (removeBuff != null) {
+    removeBuff.forEach(buff => {
       for (let activeBuff of activeBuffs[activeCharacter]) { 
-        if (activeBuff.buff.name.includes(removeBuff)) {
+        if (activeBuff.buff.name.includes(buff)) {
           activeBuffs[activeCharacter].delete(activeBuff);
           console.log(`removing buff: ${activeBuff.buff.name}`);
         }
       }
       for (let activeBuff of activeBuffs['Team']) { 
-        if (activeBuff.buff.name.includes(removeBuff)) {
+        if (activeBuff.buff.name.includes(buff)) {
           activeBuffs['Team'].delete(activeBuff);
           console.log(`removing buff: ${activeBuff.buff.name}`);
         }
       }
-    }
+    })
   }
 
   var startRow = dataCellRowNextSub;
@@ -2163,7 +2165,7 @@ class PassiveDamage {
           if (condition === 'Resonance')
             handleEnergyShare(value, activeCharacter);
           else
-            charData[activeCharacter].dCond.set(condition, charData[activeCharacter].dCond.get(condition) + value);
+            charData[activeCharacter].dCond.set(condition, charData[activeCharacter].dCond.get(condition) + value * this.procMultiplier);
         }
       });
     }
