@@ -1163,7 +1163,11 @@ function runCalculations() {
               passiveCurrentSlot = true;
             } else
               writeDamage[passiveDamage.slot - ROTATION_START] += damageProc;
-            writeDamageNote[passiveDamage.slot - ROTATION_START] = passiveDamage.getNote();
+            // Each element writeDamageNote[cell] is a dictionary that maps [passive damage name => note string]
+            // One note string per passive damage buff
+            if (writeDamageNote[passiveDamage.slot - ROTATION_START] == undefined)
+              writeDamageNote[passiveDamage.slot - ROTATION_START] = {};
+            writeDamageNote[passiveDamage.slot - ROTATION_START][passiveDamage.name] = passiveDamage.getNote();
           }
         }
       });
@@ -1196,7 +1200,6 @@ function runCalculations() {
         writeDamage[writeDamage.length - 1] += totalDamage;
       else
         writeDamage.push(totalDamage);
-      writeDamageNote.push('');
     }
     
     updateDamage(skillRef.name, skillRef.classifications, activeCharacter, damage, totalDamage, totalBuffMap);
@@ -1253,8 +1256,13 @@ function runCalculations() {
     
     for (let i = 0; i < writeDamageNote.length; i++) {
       let trueIndex = ROTATION_START + i;
-      if (writeDamageNote[i].length > 0) { //only write if there's actually something
-        rotationSheet.getRange(`${dataCellColDmg}${trueIndex}`).setNote(writeDamageNote[i]);
+      if (writeDamageNote[i] != undefined) { //only write if there's actually something
+        let note = '';
+        // Concatenate all note strings together
+        Object.entries(writeDamageNote[i]).forEach(([_, noteString]) => {
+          note += noteString
+        })
+        rotationSheet.getRange(`${dataCellColDmg}${trueIndex}`).setNote(note);
         rotationSheet.getRange(`${dataCellColDmg}${trueIndex}`).setFontWeight('bold');
       }
     }
@@ -2256,17 +2264,17 @@ class PassiveDamage {
     let additiveValueKey = `${this.name} (Additive)`;
     if (this.limit == 1) {
       if (this.name === 'Star Glamour' && sequences['Jinhsi'] >= 2) //todo...
-        return `This skill triggered an additional damage effect: ${this.name}, dealing ${this.totalDamage.toFixed(2)} DMG (Base Ratio: ${(this.damage * 100).toFixed(2)}%  x ${skillLevelMultiplier.toFixed(2)} + ${(this.totalBuffMap.has(additiveValueKey) ? this.totalBuffMap.get(additiveValueKey) * 100 : 0)}%).`;
+        return `This skill triggered an additional damage effect: ${this.name}, dealing ${this.totalDamage.toFixed(2)} DMG (Base Ratio: ${(this.damage * 100).toFixed(2)}%  x ${skillLevelMultiplier.toFixed(2)} + ${(this.totalBuffMap.has(additiveValueKey) ? this.totalBuffMap.get(additiveValueKey) * 100 : 0)}%).\n`;
       else
-        return `This skill triggered an additional damage effect: ${this.name}, dealing ${this.totalDamage.toFixed(2)} DMG (Base Ratio: ${(this.damage * 100).toFixed(2)}%  x ${skillLevelMultiplier.toFixed(2)} + ${(this.totalBuffMap.has(additiveValueKey) ? this.totalBuffMap.get(additiveValueKey) * 100 : 0)}%).`;
+        return `This skill triggered an additional damage effect: ${this.name}, dealing ${this.totalDamage.toFixed(2)} DMG (Base Ratio: ${(this.damage * 100).toFixed(2)}%  x ${skillLevelMultiplier.toFixed(2)} + ${(this.totalBuffMap.has(additiveValueKey) ? this.totalBuffMap.get(additiveValueKey) * 100 : 0)}%).\n`;
     } else {
       if (this.type === 'TickOverTime') {
         if (this.name.startsWith("Jué"))
-          return `This skill triggered a passive DOT effect: ${this.name}, which has ticked ${this.numProcs} times for ${this.totalDamage.toFixed(2)} DMG in total (Base Ratio: ${(this.damage * 100).toFixed(2)}% + ${(this.totalBuffMap.has(additiveValueKey) ? this.totalBuffMap.get(additiveValueKey) * 100 : 0).toFixed(2)}%).`;
+          return `This skill triggered a passive DOT effect: ${this.name}, which has ticked ${this.numProcs} times for ${this.totalDamage.toFixed(2)} DMG in total (Base Ratio: ${(this.damage * 100).toFixed(2)}% + ${(this.totalBuffMap.has(additiveValueKey) ? this.totalBuffMap.get(additiveValueKey) * 100 : 0).toFixed(2)}%).\n`;
         else
-          return `This skill triggered a passive DOT effect: ${this.name}, which has ticked ${this.numProcs} times for ${this.totalDamage.toFixed(2)} DMG in total (Base Ratio: ${(this.damage * 100).toFixed(2)}% x ${skillLevelMultiplier.toFixed(2)} + ${(this.totalBuffMap.has(additiveValueKey) ? this.totalBuffMap.get(additiveValueKey) * 100 : 0).toFixed(2)}%).`;
+          return `This skill triggered a passive DOT effect: ${this.name}, which has ticked ${this.numProcs} times for ${this.totalDamage.toFixed(2)} DMG in total (Base Ratio: ${(this.damage * 100).toFixed(2)}% x ${skillLevelMultiplier.toFixed(2)} + ${(this.totalBuffMap.has(additiveValueKey) ? this.totalBuffMap.get(additiveValueKey) * 100 : 0).toFixed(2)}%).\n`;
       } else {
-        return `This skill triggered a passive damage effect: ${this.name}, which has procced ${this.numProcs} times for ${this.totalDamage.toFixed(2)} DMG in total (Base Ratio: ${(this.damage * 100).toFixed(2)}% x ${skillLevelMultiplier.toFixed(2)} + ${(this.totalBuffMap.has(additiveValueKey) ? this.totalBuffMap.get(additiveValueKey) * 100 : 0).toFixed(2)}%).`;
+        return `This skill triggered a passive damage effect: ${this.name}, which has procced ${this.numProcs} times for ${this.totalDamage.toFixed(2)} DMG in total (Base Ratio: ${(this.damage * 100).toFixed(2)}% x ${skillLevelMultiplier.toFixed(2)} + ${(this.totalBuffMap.has(additiveValueKey) ? this.totalBuffMap.get(additiveValueKey) * 100 : 0).toFixed(2)}%).\n`;
       }
     }
   }
