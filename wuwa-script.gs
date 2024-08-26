@@ -2214,9 +2214,9 @@ class PassiveDamage {
         if (value > 0) {
           console.log(`[PASSIVE DAMAGE] evaluating dynamic condition for ${this.name}: ${condition} x${value}`);
           if (condition === 'Resonance')
-            handleEnergyShare(value, activeCharacter);
+            handleEnergyShare(value, this.owner);
           else
-            charData[activeCharacter].dCond.set(condition, charData[activeCharacter].dCond.get(condition) + value * this.procMultiplier);
+            charData[this.owner].dCond.set(condition, charData[this.owner].dCond.get(condition) + value * this.procMultiplier);
         }
       });
     }
