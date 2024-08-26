@@ -901,17 +901,18 @@ function runCalculations() {
               totalBuffMap.set(newKey, currentAmount + buffAmount); // Update the total amount
             }
           } else {
-            if (!totalBuffMap.has(newKey)) { //skill-specific buff
-              if (skillRef.name.includes(newKey)) {
-                let currentBonus = totalBuffMap.get(buffKey);
-                totalBuffMap.set(buffKey, currentBonus + buffAmount); // Update the total amount
-                console.log(`updating new key from ${newKey}; current bonus: ${currentBonus}; buffKey: ${buffKey}; buffAmount: ${buffAmount}`);
-              } else { //add the skill key as a new value for potential procs
-                totalBuffMap.set(`${newKey} (${buffKey})`, buffAmount);
-                console.log(`no match, but adding key ${newKey} (${buffKey})`)
-              }
-            } else {
+            if (totalBuffMap.has(newKey)) {
               totalBuffMap.set(newKey, currentAmount + buffAmount); // Update the total amount
+            } else if (totalBuffMap.has(`${newKey} (${buffKey})`)) {
+              currentAmount = totalBuffMap.get(`${newKey} (${buffKey})`);
+              totalBuffMap.set(`${newKey} (${buffKey})`, currentAmount + buffAmount); // Update the total amount
+            } else if (skillRef.name.includes(newKey)) { //skill-specific buff
+              let currentBonus = totalBuffMap.get(buffKey);
+              totalBuffMap.set(buffKey, currentBonus + buffAmount); // Update the total amount
+              console.log(`updating new key from ${newKey}; current bonus: ${currentBonus}; buffKey: ${buffKey}; buffAmount: ${buffAmount}`);
+            } else { //add the skill key as a new value for potential procs
+              totalBuffMap.set(`${newKey} (${buffKey})`, buffAmount);
+              console.log(`no match, but adding key ${newKey} (${buffKey})`)
             }
           }
           //console.log("updating buff " + key + " to " + (currentAmount) + " (+" + buffAmount + ")");
