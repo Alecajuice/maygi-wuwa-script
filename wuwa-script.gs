@@ -471,7 +471,9 @@ function runCalculations() {
 
         console.log("Processing queued buff [" + queuedBuff.buff.name + "]; applies to " + copy.buff.appliesTo);
         if (queuedBuff.buff.type.includes('ConsumeBuff')) { //a queued consumebuff will instantly remove said buffs
-          removeBuffInstant.push(copy.buff.classifications);
+          copy.buff.classifications.split(',').forEach(buffToRemove => { //iterate over list of buffs to consume
+            removeBuffInstant.push(buffToRemove);
+          })
         } else {
           activeSet.forEach(activeBuff => { //loop through and look for if the buff already exists
             if (activeBuff.buff.name == copy.buff.name && activeBuff.buff.triggeredBy === copy.buff.triggeredBy) {
@@ -646,11 +648,15 @@ function runCalculations() {
           healFound = true;
         }
         if (buff.type === 'ConsumeBuffInstant') { //these buffs are immediately withdrawn before they are calculating
-          removeBuffInstant.push(buff.classifications);
+          buff.classifications.split(',').forEach(buffToRemove => { //iterate over list of buffs to consume
+            removeBuffInstant.push(buffToRemove);
+          })
         } else if (buff.type === 'ConsumeBuff') {
-          if (removeBuff.includes(buff.classifications))
-            console.log("UNEXPECTED double removebuff condition.");
-          removeBuff.push(buff.classifications); //remove this later, after other effects apply
+          buff.classifications.split(',').forEach(buffToRemove => { //iterate over list of buffs to consume
+            if (removeBuff.includes(buffToRemove))
+              console.log("UNEXPECTED double removebuff condition.");
+            removeBuff.push(buffToRemove); //remove this later, after other effects apply
+          })
         } else if (buff.type === 'ResetBuff') {
           let buffArray = Array.from(activeBuffs[activeCharacter]);
           let buffArrayTeam = Array.from(activeBuffs['Team']);
