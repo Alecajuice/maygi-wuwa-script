@@ -2077,7 +2077,7 @@ class PassiveDamage {
     this.lastTime = currentTime;
     let procs = 0;
     let timeBetweenHits = castTime / (numberOfHits > 1 ? numberOfHits - 1 : 1);
-    console.log(`handleProcs called with currentTime: ${currentTime}, castTime: ${castTime}, numberOfHits: ${numberOfHits}; type: ${this.type}`);
+    console.log(`handleProcs called with currentTime: ${currentTime}, name: ${this.name}, castTime: ${castTime}, numberOfHits: ${numberOfHits}; type: ${this.type}`);
     console.log(`lastProc: ${this.lastProc}, interval: ${this.interval}, timeBetweenHits: ${timeBetweenHits}`);
     this.activated = true;
     if (this.interval > 0) {
@@ -2118,7 +2118,7 @@ class PassiveDamage {
           }
           if (effectiveInterval < castTime) { //potentially add multiple stacks
             let maxStacksByTime = (effectiveInterval == 0 ? numberOfHits : Math.floor(castTime / effectiveInterval));
-            stacksToAdd = Math.min(maxStacksByTime, numberOfHits);
+            stacksToAdd = Math.min(procs, Math.min(maxStacksByTime, numberOfHits));
           }
           console.log("stacking buff " + buffObject.name + " is procced; " + buffObject.triggeredBy + "; stacks: " + buff.stacks + "; toAdd: " + stacksToAdd + "; mult: " + stackMult + "; target stacks: " + (Math.min((stacksToAdd * stackMult), buffObject.stackLimit)) + "; interval: " + effectiveInterval);
           buff.stacks = Math.min(stacksToAdd * stackMult, buffObject.stackLimit);
