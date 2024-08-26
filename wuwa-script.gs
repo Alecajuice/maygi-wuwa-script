@@ -1751,7 +1751,7 @@ function rowToCharacterInfo(row, levelCap) {
     case "43311 (ER/ER)":
       updateBonusStats(bonusStatsArray, 'Flat Attack', 350);
       updateBonusStats(bonusStatsArray, 'Flat Health', 2280 * 2);
-      bonusStatsArray.push(['Attack', 0.18 * 2]);
+      bonusStatsArray.push([CHAR_CONSTANTS[row[1]].minorForte1, 0.18 * 2]);
       bonusStatsArray.push(['Energy Regen', 0.32 * 2]);
       if ((critBase + critBaseWeapon + critConditional) * 2 < (critDmgBase + critDmgBaseWeapon) - 1)
         critBase += 0.22;
@@ -1762,7 +1762,7 @@ function rowToCharacterInfo(row, levelCap) {
       updateBonusStats(bonusStatsArray, 'Flat Attack', 350);
       updateBonusStats(bonusStatsArray, 'Flat Health', 2280 * 2);
       updateBonusStats(bonusStatsArray, charElement, 0.6 - bonusStatsArray.find(element => element[0] === charElement)[1]);
-      bonusStatsArray.push(['Attack', 0.18 * 2]);
+      bonusStatsArray.push([CHAR_CONSTANTS[row[1]].minorForte1, 0.18 * 2]);
       if ((critBase + critBaseWeapon + critConditional) * 2 < (critDmgBase + critDmgBaseWeapon) - 1)
         critBase += 0.22;
       else
@@ -1772,7 +1772,7 @@ function rowToCharacterInfo(row, levelCap) {
       updateBonusStats(bonusStatsArray, 'Flat Attack', 350);
       updateBonusStats(bonusStatsArray, 'Flat Health', 2280 * 2);
       updateBonusStats(bonusStatsArray, charElement, 0.3 - bonusStatsArray.find(element => element[0] === charElement)[1]);
-      bonusStatsArray.push(['Attack', 0.18 * 2 + 0.3]);
+      bonusStatsArray.push([CHAR_CONSTANTS[row[1]].minorForte1, 0.18 * 2 + 0.3]);
       if ((critBase + critBaseWeapon + critConditional) * 2 < (critDmgBase + critDmgBaseWeapon) - 1)
         critBase += 0.22;
       else
@@ -1781,7 +1781,7 @@ function rowToCharacterInfo(row, levelCap) {
     case "43311 (Atk/Atk)":
       updateBonusStats(bonusStatsArray, 'Flat Attack', 350);
       updateBonusStats(bonusStatsArray, 'Flat Health', 2280 * 2);
-      bonusStatsArray.push(['Attack', 0.18 * 2 + 0.6]);
+      bonusStatsArray.push([CHAR_CONSTANTS[row[1]].minorForte1, 0.18 * 2 + 0.6]);
       if ((critBase + critBaseWeapon + critConditional) * 2 < (critDmgBase + critDmgBaseWeapon) - 1)
         critBase += 0.22;
       else
@@ -1790,7 +1790,7 @@ function rowToCharacterInfo(row, levelCap) {
     case "44111 (Adaptive)":
       updateBonusStats(bonusStatsArray, 'Flat Attack', 300);
       updateBonusStats(bonusStatsArray, 'Flat Health', 2280 * 3);
-      bonusStatsArray.push(['Attack', 0.18 * 3]);
+      bonusStatsArray.push([CHAR_CONSTANTS[row[1]].minorForte1, 0.18 * 3]);
       for (let i = 0; i < 2; i++) {
         console.log(`crit base: ${critBaseWeapon}; crit conditional: ${critConditional}; critDmgBase: ${critDmgBaseWeapon}`);
         if ((critBase + critBaseWeapon + critConditional) * 2 < (critDmgBase + critDmgBaseWeapon) - 1)
