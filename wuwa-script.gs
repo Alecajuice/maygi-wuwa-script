@@ -1043,10 +1043,15 @@ function runCalculations() {
       if (passiveDamageQueued != null) { //snapshot passive damage BEFORE team buffs are applied
         //TEMP: move this above activeBuffsArrayTeam and implement separate buff tracking
         for (let j = 0; j < passiveDamageInstances.length; j++) { //remove any duplicates first
+          let found = false;
           if (passiveDamageInstances[j].name === passiveDamageQueued.name) {
             passiveDamageInstances[j].remove = true;
+            passiveDamageQueued.lastProc = passiveDamageInstances[j].lastProc; //inherit proc cooldown
             console.log(`new instance of passive damage ${passiveDamageQueued.name} found. removing old entry`);
-            break;
+            if (found) {
+              //there is a bug, please fix
+              console.warn("Found multiple Passive Damage instances with the same name! Removing extra copy...");
+            }
           }
         }
         passiveDamageQueued.setTotalBuffMap(totalBuffMap);
@@ -1067,9 +1072,12 @@ function runCalculations() {
     console.log("DAMAGE CALC for : " + skillRef.name);
     console.log(skillRef);
     console.log("multiplier: " + totalBuffMap.get('Multiplier'));
+    //remove all passive damage instances specified by a ConsumeBuff or ConsumeBuffInstant buff
     removeBuff.forEach(buff => {
       passiveDamageInstances = passiveDamageInstances.filter(passiveDamage => !passiveDamage.canRemove(currentTime, buff));
     })
+    //remove all passive damage instances marked to be removed, if the above missed any
+    passiveDamageInstances = passiveDamageInstances.filter(passiveDamage => !passiveDamage.remove);
 
     function evaluateDCond(value, condition) {
       if (value && value != 0) {
@@ -2135,7 +2143,7 @@ class PassiveDamage {
   }
 
   canRemove(currentTime, removeBuff) {
-    return this.numProcs >= this.limit && this.limit > 0 || (currentTime - this.startTime > this.duration) || (removeBuff && this.name.includes(removeBuff)) || this.remove;
+    return (this.numProcs >= this.limit && this.limit > 0) || (currentTime - this.startTime > this.duration) || (removeBuff && this.name.includes(removeBuff)) || this.remove;
   }
 
   canProc(currentTime, skillRef) {
