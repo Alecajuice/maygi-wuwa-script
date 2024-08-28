@@ -1756,7 +1756,7 @@ function rowToCharacterInfo(row, levelCap) {
   if (characterName === 'Changli' && row[2] >= 2)
     critConditional = 0.25;
   let echoCost1 = 0.18;
-  if (CHAR_CONSTANTS[row[1]].minorForte1 === 'HP')
+  if (CHAR_CONSTANTS[row[1]].minorForte1 === 'Health')
     echoCost1 = 0.228;
   switch(build) {
     case "43311 (ER/ER)":
